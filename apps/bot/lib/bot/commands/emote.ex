@@ -11,32 +11,33 @@ defmodule Bot.Commands.Emote do
 
   def run(msg, [_command, emote, 1]) do
     EmoteStore.Emote.find_default_emote(emote)
-    |> send_emote(msg.channel_id)
+    |> send_emote(msg)
   end
 
   def run(msg, [_command, emote, n]) do
     emote
     |> EmoteStore.Emote.find_emotes()
     |> Enum.at(elem(Integer.parse("#{n}"), 0) - 1)
-    |> send_emote(msg.channel_id)
+    |> send_emote(msg)
   end
 
-  def send_emote(emote, channel_id) do
+  def send_emote(emote, msg) do
     case emote do
       %EmoteStore.Emote{name: name, s3_id: id} ->
         with {:ok, file} <- EmoteStore.S3.get_emote(id),
              ext = String.split(id, ".", parts: 2) |> Enum.at(1),
-             {:ok, _} <- Api.create_message(channel_id, file: %{name: name <> "." <> ext, body: file}) do
+             {:ok, _} <- Api.create_message(msg.channel_id, file: %{name: name <> "." <> ext, body: file}) do
+          Api.delete_message!(msg)
           :ok
         else
           err ->
             Logger.error("Error sending emote: #{err}")
-            Api.create_message(channel_id, "Something went wrong, I think I'm dying")
+            Api.create_message(msg.channel_id, "Something went wrong, I think I'm dying")
             :error
         end
 
       nil ->
-        Api.create_message(channel_id, "Couldn't find that emote :'(")
+        Api.create_message(msg.channel_id, "Couldn't find that emote :'(")
         :ok
 
       e ->

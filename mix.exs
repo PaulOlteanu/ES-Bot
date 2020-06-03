@@ -7,7 +7,8 @@ defmodule EsBot.MixProject do
       releases: [
         prod: [
           version: "0.1.0",
-          applications: [emote_store: :permanent, bot: :permanent]
+          applications: [emote_store: :permanent, bot: :permanent],
+          include_executables_for: [:unix]
         ]
       ],
       version: "0.1.0",
