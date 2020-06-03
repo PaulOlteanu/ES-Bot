@@ -3,9 +3,9 @@ Description=ES Bot service
 After=network.target
 
 [Service]
-Environment=HOME=/home/es_bot
-ExecStart=${HOME}/_build/prod/rel/prod/bin/prod start
-ExecStop=${HOME}/_build/prod/rel/prod/bin/prod stop
+Environment=HOME=/home/es_bot/ES-Bot
+ExecStart=/home/es_bot/ES-Bot/_build/prod/rel/prod/bin/prod start
+ExecStop=/home/es_bot/ES-Bot/_build/prod/rel/prod/bin/prod stop
 Restart=always
 RestartSec=10
 StandardOutput=syslog
