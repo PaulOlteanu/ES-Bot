@@ -16,5 +16,6 @@ defmodule EmoteStore do
     # Use Memento.Table.wait when it gets implemented
     Memento.Table.create(EmoteStore.Emote, disc_copies: nodes)
     Memento.Table.create(EmoteStore.Work, disc_copies: nodes)
+    :mnesia.wait_for_tables([EmoteStore.Emote, EmoteStore.Work], 5_000)
   end
 end
