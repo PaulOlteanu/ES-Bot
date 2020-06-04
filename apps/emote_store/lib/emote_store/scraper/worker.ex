@@ -42,6 +42,7 @@ defmodule EmoteStore.Scraper.Worker do
         Enum.map(emotes, fn %{name: name, url: url} ->
           EmoteStore.Emote.create_emote(name, url)
         end)
+        EmoteStore.Work.increment_page(platform)
 
       {:error, reason} ->
         case reason do
@@ -54,8 +55,6 @@ defmodule EmoteStore.Scraper.Worker do
       e ->
         Logger.error("UNKNOWN ERROR!: #{e}")
     end
-
-    EmoteStore.Work.increment_page(platform)
 
     Logger.info("Next scrape for #{platform} will be at #{DateTime.add(DateTime.now!("America/Toronto"), 5 * 60, :second)}")
     Process.send_after(self(), :scrape, 5 * 60 * 1000)
