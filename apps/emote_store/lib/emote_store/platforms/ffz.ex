@@ -1,6 +1,6 @@
 defmodule EmoteStore.Platforms.FFZ do
   def get_page(page) do
-    with {:ok, response} <- HTTPoison.get("https://api.frankerfacez.com/v1/emoticons?per_page=50&page=#{page}&sort=count-desc"),
+    with {:ok, response} <- HTTPoison.get("https://api.frankerfacez.com/v1/emoticons?per_page=50&page=#{page}&sort=count-desc", timeout: 20_000, recv_timeout: 20_000),
          {:ok, body} <- Jason.decode(Map.get(response, :body)),
          emotes = Map.get(body, "emoticons") do
       {:ok,
