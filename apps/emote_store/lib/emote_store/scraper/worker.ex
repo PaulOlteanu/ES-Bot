@@ -37,28 +37,32 @@ defmodule EmoteStore.Scraper.Worker do
   def handle_info(:scrape, %{page: page, platform: platform}) do
     Logger.info("Getting page #{page} on #{platform}")
 
-    case EmoteStore.Platforms.get_platform(platform).get_page(page) do
-      {:ok, emotes} ->
-        Enum.map(emotes, fn %{name: name, url: url} ->
-          EmoteStore.Emote.create_emote(name, url)
-        end)
-        EmoteStore.Work.increment_page(platform)
+    page =
+      case EmoteStore.Platforms.get_platform(platform).get_page(page) do
+        {:ok, emotes} ->
+          Enum.map(emotes, fn %{name: name, url: url} ->
+            EmoteStore.Emote.create_emote(name, url)
+          end)
+          EmoteStore.Work.increment_page(platform)
+          page + 1
 
-      {:error, reason} ->
-        case reason do
-          %HTTPoison.Error{id: id, reason: r} ->
-            Logger.error("HTTPoison Error: Id: #{id}, Reason: #{r}")
-          _ ->
-            Logger.error("Error: #{reason}")
-        end
+        {:error, reason} ->
+          case reason do
+            %HTTPoison.Error{id: id, reason: r} ->
+              Logger.error("HTTPoison Error: Id: #{id}, Reason: #{r}")
+            _ ->
+              Logger.error("Error: #{reason}")
+          end
+          page
 
-      e ->
-        Logger.error("UNKNOWN ERROR!: #{e}")
-    end
+        e ->
+          Logger.error("UNKNOWN ERROR!: #{e}")
+          page
+      end
 
     Logger.info("Next scrape for #{platform} will be at #{DateTime.add(DateTime.now!("America/Toronto"), 5 * 60, :second)}")
     Process.send_after(self(), :scrape, 5 * 60 * 1000)
-    {:noreply, %{platform: platform, page: page + 1}}
+    {:noreply, %{platform: platform, page: page}}
   end
 
   @impl true
