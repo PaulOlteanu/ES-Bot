@@ -6,18 +6,11 @@ defmodule Bot.Commands.Emote do
   def run(msg, []), do: Api.create_message(msg.channel_id, "Usage: \"!e emote\"")
 
   def run(msg, [command, emote]) do
-    run(msg, [command, emote, 1])
+    run(msg, [command, emote, "1"])
   end
 
-  def run(msg, [_command, emote, 1]) do
-    EmoteStore.Emote.find_default_emote(emote)
-    |> send_emote(msg)
-  end
-
-  def run(msg, [_command, emote, n]) do
-    emote
-    |> EmoteStore.Emote.find_emotes()
-    |> Enum.at(elem(Integer.parse("#{n}"), 0) - 1)
+  def run(msg, [_command, emote_name, index]) do
+    EmoteStore.get_emote(emote_name, elem(Integer.parse("#{index}"), 0) - 1)
     |> send_emote(msg)
   end
 

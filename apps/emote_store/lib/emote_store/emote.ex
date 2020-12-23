@@ -1,6 +1,6 @@
 defmodule EmoteStore.Emote do
   use Memento.Table,
-    attributes: [:id, :name, :s3_id, :default?],
+    attributes: [:id, :name, :s3_id, :provider, :provider_id],
     index: [:name],
     type: :ordered_set,
     autoincrement: true
@@ -9,11 +9,11 @@ defmodule EmoteStore.Emote do
 
   alias EmoteStore.Emote
 
-  def create_emote(name, url) do
-    {:ok, s3_id} = EmoteStore.S3.store_emote(url)
-    default? = find_default_emote(name) == nil
+  def create_emote(emote) do
+    {provider_url, emote} = Map.pop(emote, :provider_url)
+    {:ok, s3_id} = EmoteStore.S3.store_emote(provider_url)
     Memento.transaction!(fn ->
-      %Emote{name: name, s3_id: s3_id, default?: default?}
+      struct(Emote, Map.put(emote, :s3_id, s3_id))
       |> Memento.Query.write()
     end)
   end
@@ -34,19 +34,14 @@ defmodule EmoteStore.Emote do
     end)
   end
 
-  def find_emotes(emote_name) do
-    Memento.transaction!(fn ->
-      Memento.Query.select(Emote, {:==, :name, emote_name})
-    end)
-  end
-
-  def find_default_emote(emote_name) do
-    guards = [
-      {:==, :name, emote_name},
-      {:==, :default?, true}
+  def find_emote(%{provider: provider, provider_id: provider_id} = _emote) do
+    query = [
+      {:==, :provider, provider},
+      {:==, :provider_id, provider_id}
     ]
+
     Memento.transaction!(fn ->
-      Memento.Query.select(Emote, guards)
+      Memento.Query.select(Emote, query)
     end)
     |> List.first()
   end

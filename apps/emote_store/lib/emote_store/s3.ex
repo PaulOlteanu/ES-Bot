@@ -28,10 +28,6 @@ defmodule EmoteStore.S3 do
     end
   end
 
-  # TODO: Implement this. Will be useful for testing (but I probably won't get around to making tests)
-  # def delete_emote(id) do
-  # end
-
   @spec get_emote_url(String.t()) :: String.t()
   def get_emote_url(emote_id), do: "https://#{@bucket}.s3.us-east-2.amazonaws.com/#{emote_id}"
 

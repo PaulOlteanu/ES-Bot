@@ -6,12 +6,12 @@ defmodule EsBot.MixProject do
       apps_path: "apps",
       releases: [
         prod: [
-          version: "0.1.0",
+          version: "1.0.0",
           applications: [emote_store: :permanent, bot: :permanent],
           include_executables_for: [:unix]
         ]
       ],
-      version: "0.1.0",
+      version: "1.0.0",
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
