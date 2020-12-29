@@ -1,15 +1,15 @@
-defmodule Bot.Receiver do
+defmodule ESBot.Receiver do
   use Nostrum.Consumer
 
   @spec start_link :: Supervisor.on_start()
   def start_link do
-    Consumer.start_link(__MODULE__, name: Bot.Receiver)
+    Consumer.start_link(__MODULE__, name: ESBot.Receiver)
   end
 
   def handle_event({:MESSAGE_CREATE, msg, _ws_state}) do
     if String.starts_with?(msg.content, "!") do
       [command | args] = String.split(msg.content, " ", trim: true)
-      Bot.Commands.run(command, msg, args)
+      ESBot.Commands.run(command, msg, args)
     end
   end
 

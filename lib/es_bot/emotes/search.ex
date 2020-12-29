@@ -1,9 +1,9 @@
-defmodule EmoteStore.Search do
+defmodule ESBot.Emotes.Search do
   @url_base "https://www.googleapis.com/customsearch/v1/siterestrict"
 
   def search(emote_name, result_index \\ 0) do
     opts = %{
-      key: Application.get_env(:emote_store, :search_key),
+      key: Application.get_env(:es_bot, :search_key),
       cx: "f96e8d3833deb4cee",
       q: emote_name,
       num: 10,
@@ -20,7 +20,7 @@ defmodule EmoteStore.Search do
       if (contains_caps?(emote_name)) do
         Enum.map(emotes, fn emote_result ->
           provider = get_provider(emote_result)
-          emote = EmoteStore.Providers.get_provider(provider).parse_result(emote_result)
+          emote = ESBot.Emotes.Providers.get_provider(provider).parse_result(emote_result)
           if emote.name == emote_name, do: emote, else: nil
         end)
         |> Enum.reject(&is_nil/1)
@@ -28,7 +28,7 @@ defmodule EmoteStore.Search do
       else
         emote_result = Enum.at(emotes, index)
         provider = get_provider(emote_result)
-        EmoteStore.Providers.get_provider(provider).parse_result(emote_result)
+        ESBot.Emotes.Providers.get_provider(provider).parse_result(emote_result)
       end
     end
   end

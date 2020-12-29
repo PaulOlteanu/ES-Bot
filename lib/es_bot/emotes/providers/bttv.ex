@@ -1,10 +1,12 @@
-defmodule EmoteStore.Providers.FFZ do
-  @slug :ffz
+defmodule ESBot.Emotes.Providers.BTTV do
+  @slug :bttv
 
   def parse_result(%{"link" => link, "title" => title} = _emote_result) do
     name = extract_name(title)
     provider_id = extract_id(link)
     provider_url = get_url(provider_id)
+
+    # TODO: Check api for resolutions
 
     %{
       name: name,
@@ -24,11 +26,9 @@ defmodule EmoteStore.Providers.FFZ do
     |> Map.get(:path)
     |> String.split("/")
     |> List.last()
-    |> String.split("-")
-    |> List.first()
   end
 
   def get_url(id) do
-    "https://cdn.frankerfacez.com/emote/#{id}/2"
+    "https://cdn.betterttv.net/emote/#{id}/2x"
   end
 end

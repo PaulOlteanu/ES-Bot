@@ -1,4 +1,4 @@
-defmodule EmoteStore.Emote do
+defmodule ESBot.Repo.Emote do
   use Memento.Table,
     attributes: [:id, :name, :s3_id, :provider, :provider_id],
     index: [:name],
@@ -7,11 +7,11 @@ defmodule EmoteStore.Emote do
 
   require Logger
 
-  alias EmoteStore.Emote
+  alias ESBot.Repo.Emote
 
   def create_emote(emote) do
     {provider_url, emote} = Map.pop(emote, :provider_url)
-    {:ok, s3_id} = EmoteStore.S3.store_emote(provider_url)
+    {:ok, s3_id} = ESBot.S3.store_emote(provider_url)
     Memento.transaction!(fn ->
       struct(Emote, Map.put(emote, :s3_id, s3_id))
       |> Memento.Query.write()

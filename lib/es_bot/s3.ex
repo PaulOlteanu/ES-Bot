@@ -1,7 +1,7 @@
-defmodule EmoteStore.S3 do
+defmodule ESBot.S3 do
   require Logger
 
-  @bucket Application.fetch_env!(:emote_store, :s3_bucket)
+  @bucket Application.fetch_env!(:es_bot, :s3_bucket)
   @spec store_emote(String.t()) :: {:ok, String.t()} | {:error, any()}
   def store_emote(url) do
     with {:ok, %{status_code: 200, body: body}} <- HTTPoison.get(url),
@@ -12,7 +12,7 @@ defmodule EmoteStore.S3 do
       {:ok, dest_path}
     else
       err ->
-        Logger.error("ERROR: #{err}")
+        Logger.error("ERROR: #{inspect(err)}")
         err
     end
   end
@@ -23,8 +23,8 @@ defmodule EmoteStore.S3 do
       {:ok, body}
     else
       err ->
-         Logger.error("ERROR: #{err}")
-         err
+        Logger.error("ERROR: #{inspect(err)}")
+        err
     end
   end
 

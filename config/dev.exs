@@ -2,5 +2,5 @@ import Config
 
 config :logger, :console, level: :info
 
-config :emote_store,
-  s3_bucket: "emote-store-dev"
+config :es_bot,
+  s3_bucket: "es-bot-dev"

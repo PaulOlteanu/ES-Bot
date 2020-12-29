@@ -6,9 +6,6 @@ import Config
 
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
-config :emote_store,
-  worker_registry: :scraper_worker_registry
-
 config :ex_aws,
   region: "us-east-2",
   json_codec: Jason
