@@ -1,20 +1,41 @@
 defmodule ESBot.Commands.Emote do
   alias Nostrum.Api
   alias ESBot.Repo
+  alias ESBot.Helpers
 
   require Logger
 
-  def run(msg, []), do: Api.create_message(msg.channel_id, "Usage: \"!e emote\"")
+  @command_spec %{
+    name: "emote",
+    description: "Get an emote",
+    options: [
+      %{
+        type: 3,
+        name: "emote_name",
+        description: "Name of the emote",
+        required: true,
+        default: true
+      },
+      %{
+        type: 4,
+        name: "index",
+        description: "Which result to use (can be left blank)",
+        required: false
+      }
+    ]
+  }
 
-  def run(msg, [command, emote]) do
-    run(msg, [command, emote, "1"])
-  end
+  def get_command_spec(), do: @command_spec
 
-  def run(msg, [_command, emote_name, index]) do
-    index = elem(Integer.parse("#{index}"), 0) - 1
+  def run(%{data: %{options: options}, channel_id: channel_id} = interaction) do
+    emote_name = Helpers.get_interaction_option_value(options, "emote_name")
+    index = Helpers.get_interaction_option_value(options, "index", 1)
 
-    get_emote(emote_name, index)
-    |> send_emote(msg)
+    emote_name
+    |> get_emote(index)
+    |> send_emote(channel_id)
+
+    Api.create_interaction_response(interaction, %{type: 2})
   end
 
   defp get_emote(emote_name, index) do
@@ -31,23 +52,20 @@ defmodule ESBot.Commands.Emote do
     end
   end
 
-  defp send_emote(emote, msg) do
+  defp send_emote(emote, channel_id) do
     case emote do
       %Repo.Emote{name: name, s3_id: id} ->
         with {:ok, file} <- ESBot.S3.get_emote(id),
              ext = String.split(id, ".", parts: 2) |> Enum.at(1),
-             {:ok, _} <- Api.create_message(msg.channel_id, file: %{name: name <> "." <> ext, body: file}) do
-          Api.delete_message!(msg)
+             {:ok, _} <- Api.create_message(channel_id, file: %{name: name <> "." <> ext, body: file}) do
           :ok
         else
           err ->
             Logger.error("Error sending emote: #{inspect(err)}")
-            Api.create_message(msg.channel_id, "Something went wrong, I think I'm dying")
             :error
         end
 
       nil ->
-        Api.create_message(msg.channel_id, "Couldn't find that emote :'(")
         :ok
 
       e ->
