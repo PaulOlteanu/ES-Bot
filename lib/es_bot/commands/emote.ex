@@ -13,8 +13,7 @@ defmodule ESBot.Commands.Emote do
         type: 3,
         name: "emote_name",
         description: "Name of the emote",
-        required: true,
-        default: true
+        required: true
       },
       %{
         type: 4,
