@@ -12,8 +12,10 @@ defmodule ESBot.Receiver do
     Enum.each(ESBot.Commands.get_command_specs(), fn command_spec ->
       Nostrum.Api.create_guild_application_command(@test_guild_id, command_spec)
 
+      # TODO: Fix this
       if Application.get_env(:es_bot, :register_globally) do
-        Nostrum.Api.create_global_application_command(command_spec)
+        Nostrum.Api.create_guild_application_command(412092010577657857, command_spec)
+        # Nostrum.Api.create_global_application_command(command_spec)
       end
     end)
   end
