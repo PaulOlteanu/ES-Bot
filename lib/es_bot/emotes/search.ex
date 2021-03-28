@@ -1,6 +1,8 @@
 defmodule ESBot.Emotes.Search do
   @url_base "https://www.googleapis.com/customsearch/v1/siterestrict"
 
+  # TODO: Increase page size
+  # TODO: Cache results
   def search(emote_name, result_index \\ 1) do
 
     # Start is 1 based

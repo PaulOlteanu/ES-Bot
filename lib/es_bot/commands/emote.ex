@@ -30,11 +30,22 @@ defmodule ESBot.Commands.Emote do
     emote_name = Helpers.get_interaction_option_value(options, "emote_name")
     index = Helpers.get_interaction_option_value(options, "index", 1)
 
-    emote_name
-    |> get_emote(index)
-    |> send_emote(channel_id)
+    Api.create_interaction_response(interaction, %{type: 4, data: %{
+      content: "Sending emote...",
+    }})
 
-    Api.create_interaction_response(interaction, %{type: 2})
+    try do
+      # This probably shouldn't be inside a try but I'm too lazy to fix all the error handling
+      emote_name
+      |> get_emote(index)
+      |> send_emote(channel_id)
+    after
+      Api.get_channel_messages(channel_id, 5)
+      |> elem(1)
+      |> Enum.filter(fn %{author: %{username: user}, content: text} -> user == "ES Bot" && text == "Sending emote..." end)
+      |> List.last()
+      |> Api.delete_message()
+    end
   end
 
   defp get_emote(emote_name, index) do
