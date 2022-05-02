@@ -4,13 +4,13 @@ defmodule ESBot.MixProject do
   def project do
     [
       app: :es_bot,
-      version: "2.0.0",
+      version: "2.1.0",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       releases: [
         prod: [
-          version: "2.0.0",
+          version: "2.1.0",
           include_executables_for: [:unix]
         ]
       ]
@@ -34,6 +34,7 @@ defmodule ESBot.MixProject do
       {:httpoison, "~> 1.6"},
       {:jason, "~> 1.2"},
       {:memento, "~> 0.3.1"},
+      {:mogrify, "~> 0.9.1"},
       {:nostrum, "~> 0.4.6"},
       {:sweet_xml, "~> 0.6"},
       {:tzdata, "~> 1.0"}

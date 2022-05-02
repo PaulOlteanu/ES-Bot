@@ -5,9 +5,11 @@ defmodule ESBot.S3 do
   @spec store_emote(String.t()) :: {:ok, String.t()} | {:error, any()}
   def store_emote(url) do
     with {:ok, %{status_code: 200, body: body}} <- HTTPoison.get(url),
-         {mimetype, ext} <- ExImageInfo.type(body),
+         {_mimetype, ext} <- ExImageInfo.type(body),
+         {:ok, image} <- convert_image(body, simplify_ext(ext)),
+         {mimetype, ext} <- ExImageInfo.type(image),
          dest_path <- gen_id() <> "." <> simplify_ext(ext),
-         request <- ExAws.S3.put_object(@bucket, dest_path, body, content_type: mimetype, acl: :public_read),
+         request <- ExAws.S3.put_object(@bucket, dest_path, image, content_type: mimetype, acl: :public_read),
          {:ok, %{status_code: 200}} <- ExAws.request(request) do
       {:ok, dest_path}
     else
@@ -43,7 +45,25 @@ defmodule ESBot.S3 do
     |> Enum.join()
   end
 
+  defp convert_image(image, "webp") do
+    with :ok <- File.mkdir_p(Path.dirname("tmp/temp.webp")),
+         :ok <- File.write("tmp/temp.webp", image),
+         _ <- Mogrify.open("tmp/temp.webp") |> Mogrify.format("gif") |> Mogrify.save(path: "tmp/temp.gif"),
+         {:ok, bin} <- File.read("tmp/temp.gif") do
+      {:ok, bin}
+    else
+      _ ->
+        {:error, :invalid_format}
+    end
+  end
+
+  defp convert_image(image, _), do: image
+
   defp simplify_ext(ext), do: simplify_ext(String.downcase(ext), true)
+  defp simplify_ext("gif87a", true), do: "gif"
   defp simplify_ext("gif89a", true), do: "gif"
+  defp simplify_ext("webpvp8", true), do: "webp"
+  defp simplify_ext("webpvp8l", true), do: "webp"
+  defp simplify_ext("webpvp8x", true), do: "webp"
   defp simplify_ext(ext, true), do: ext
 end

@@ -3,7 +3,7 @@ defmodule ESBot.Helpers do
     Enum.find(options, &(&1.name == option))
     |> case do
       nil -> default
-      option -> Map.get(option, :value)
+      option -> Map.get(option, :value, default)
     end
   end
 end

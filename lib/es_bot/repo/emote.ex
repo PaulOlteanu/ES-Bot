@@ -10,6 +10,8 @@ defmodule ESBot.Repo.Emote do
   alias ESBot.Repo.Emote
 
   def create_emote(emote) do
+    emote = Map.from_struct(emote)
+
     {provider_url, emote} = Map.pop(emote, :provider_url)
     {:ok, s3_id} = ESBot.S3.store_emote(provider_url)
     Memento.transaction!(fn ->
