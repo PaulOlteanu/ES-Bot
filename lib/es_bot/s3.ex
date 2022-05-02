@@ -46,6 +46,7 @@ defmodule ESBot.S3 do
   end
 
   defp convert_image(image, "webp") do
+    IO.inspect("Converting")
     with :ok <- File.mkdir_p(Path.dirname("tmp/temp.webp")),
          :ok <- File.write("tmp/temp.webp", image),
          _ <- Mogrify.open("tmp/temp.webp") |> Mogrify.format("gif") |> Mogrify.save(path: "tmp/temp.gif"),
@@ -57,7 +58,7 @@ defmodule ESBot.S3 do
     end
   end
 
-  defp convert_image(image, _), do: image
+  defp convert_image(image, _), do: {:ok, image}
 
   defp simplify_ext(ext), do: simplify_ext(String.downcase(ext), true)
   defp simplify_ext("gif87a", true), do: "gif"

@@ -4,13 +4,13 @@ defmodule ESBot.MixProject do
   def project do
     [
       app: :es_bot,
-      version: "2.1.0",
+      version: "2.1.1",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       releases: [
         prod: [
-          version: "2.1.0",
+          version: "2.1.1",
           include_executables_for: [:unix]
         ]
       ]
