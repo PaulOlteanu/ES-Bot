@@ -31,7 +31,7 @@ defmodule ESBot.Commands.Emote do
           },
           %{
             name: "FrankerFaceZ (FFZ)",
-            value: "ffv"
+            value: "ffz"
           }
         ]
       },
